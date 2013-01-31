@@ -1,0 +1,6 @@
+To build the autotools output, type:
+
+$ autoreconf -i
+
+To do so, you must have installed both the autoconf and the libtool
+packages.

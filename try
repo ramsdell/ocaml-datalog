@@ -1,0 +1,11 @@
+#! /bin/sh
+
+for i in *.dl
+do
+    b=`basename $i .dl`
+    ./datalog $i | sort > $b.out
+    if diff -u $b.txt $b.out
+    then
+	rm $b.out
+    fi
+done

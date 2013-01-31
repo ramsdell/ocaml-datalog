@@ -1,0 +1,3 @@
+Upload HTML docs to sf with:
+
+$ scp index.html datalog.html web.sourceforge.net:/home/project-web/datalog/htdocs

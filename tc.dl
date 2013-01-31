@@ -1,0 +1,7 @@
+% Transitive closure test from Guo & Gupta
+
+r(X, Y) :- r(X, Z), r(Z, Y).
+r(X, Y) :- p(X, Y), q(Y).
+p(a, b).  p(b, d).  p(b, c).
+q(b).  q(c).
+r(a, Y)?
