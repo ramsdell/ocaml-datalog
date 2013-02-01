@@ -9,6 +9,9 @@ RESULT  = datalog
 
 include $(OCAMLMAKEFILE)
 
+test:
+	./try
+
 dist:
 	DATE=`date --iso`; \
 	find . -name .git -prune -o -print0 \
