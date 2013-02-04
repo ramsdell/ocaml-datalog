@@ -173,12 +173,6 @@ module Make(D: DatalogType):
       else
 	variant_terms [] [] terms terms'
 
-    let rec mem_literal literal list =
-      match list with
-	[] -> false
-      | literal' :: list' -> variant literal literal' ||
-	mem_literal literal list'
-
 (* A hash function for literals that respects variants *)
 
 (* A variable is always hashed to the same number to ensure that the
@@ -384,10 +378,13 @@ module Make(D: DatalogType):
     type subgoal =
 	{ literal: literal;		(* the subgoal *)
 	  mutable facts: literal list;	(* derived facts *)
+          seen: unit Literaltbl.t;      (* hashed facts for quick lookup *)
 	  mutable waiters: waiter list } (* waiters of this subgoals *)
     and waiter =
 	subgoal 			(* subgoal of clause waiting *)
 	  * clause			(* clause awaiting result *)
+
+    let init_seen_table_size = 13
 
 (* resolve a clause with a literal *)
     let resolve (head, body) literal =
@@ -404,8 +401,9 @@ module Make(D: DatalogType):
       let subgoals = Literaltbl.create 128 in (* table of subgoals *)
 
       let rec fact subgoal literal =	(* handle a derived fact *)
-	if not (mem_literal literal subgoal.facts) then begin
+	if not (Literaltbl.mem subgoal.seen literal) then begin
 	  subgoal.facts <- literal :: subgoal.facts; (* record fact *)
+          Literaltbl.add subgoal.seen literal ();
 	  let use_fact (sg, cs) =
 	    match resolve cs literal with
 	      None -> ()
@@ -426,6 +424,7 @@ module Make(D: DatalogType):
 	  let sg = {
 	    literal = selected;		(* create new subgoal *)
 	    facts = [];
+            seen = Literaltbl.create init_seen_table_size;
 	    waiters = [subgoal, clause]; (* to prove clause *)
 	  } in
 	  Literaltbl.replace subgoals selected sg;
@@ -503,6 +502,7 @@ module Make(D: DatalogType):
       let subgoal = {			(* initiate a proof *)
 	literal = literal;		(* by creating a subgoal *)
 	facts = [];			(* with no waiters *)
+        seen = Literaltbl.create init_seen_table_size;
 	waiters = [];
       } in
       Literaltbl.replace subgoals literal subgoal;
