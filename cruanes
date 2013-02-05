@@ -2,7 +2,9 @@
 
 # Compares the performance of Datalog in Lua and Datalog in OCaml
 
-# Based on a test suite by Simon Cruanes <https://github.com/c-cube>.
+# Based on a test suite by Simon Cruanes <https://github.com/c-cube>
+
+# Be sure to make OCaml Datalog with "make native-code"
 
 # Location of Datalog in Lua
 DATALOG=${1:-datalog}
