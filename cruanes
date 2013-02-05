@@ -1,0 +1,80 @@
+#! /bin/sh
+
+# Compares the performance of Datalog in Lua and Datalog in OCaml
+
+# Based on a test suite by Simon Cruanes <https://github.com/c-cube>.
+
+# Location of Datalog in Lua
+DATALOG=${1:-datalog}
+
+# Sizes of test cases
+TESTS="200 500 1000 1500" 
+
+# Time format
+export TIME="\t%e Sec\t%M KB"
+
+# INDUCTION TEST
+
+# Generate a recursive induction example of given size; it makes rules
+# p(n+1) if p(n),q(n+1)
+# and
+# q(n+1) if p(n), q(n)
+# for n ranging in [0...size], and adds facts p(0) and q(0)
+
+induction() {
+    local n=${1:-10}
+    echo '% Problem size: '$n
+    for ((i=0; i<$n; i++))
+    do
+	let j=$i+1
+	echo 'p('$j') :- p('$i'), q('$j').'
+	echo 'q('$j') :- p('$i'), q('$i').'
+    done
+    echo 'p(0).'
+    echo 'q(0).'
+    echo 'p(X)?'
+}
+
+# REACHABLE TEST
+
+# Generate a graph example of given size. It produces a cyclic graph
+# with vertices in [0...size-1] and edges from i to i+1 mod size. The
+# single rule computes a transitive closure of the graph, the
+# predicate reachable() describes a clique of size size.
+
+reachable() {
+    local n=${1:-10}
+    echo '% Problem size: '$n
+    echo 'reachable(X,Y) :- edge(X,Y).'
+    echo 'reachable(X,Y) :- edge(X,Z), reachable(Z,Y).'
+    for ((i=0; i<$n; i++))
+    do
+	let j=$i+1
+	echo 'edge('$i', '$j').'
+    done
+    echo 'edge('$n', 0).'
+    echo 'reachable(X,Y)?'
+}
+
+printf "\tLua vs. OCaml Datalog Performance\n\n"
+printf "\tElapsed Time\tMax Resident\n"
+
+for i in ${TESTS}
+do
+    echo
+    echo induction $i
+    echo -n Lua
+    induction $i | /usr/bin/time $DATALOG -o /dev/null
+    echo -n OCaml
+    induction $i | /usr/bin/time ./datalog -o /dev/null
+done
+
+for i in ${TESTS}
+do
+    echo
+    echo reachable $i
+    echo -n Lua
+    reachable $i | /usr/bin/time $DATALOG -o /dev/null
+    echo -n OCaml
+    reachable $i | /usr/bin/time ./datalog -o /dev/null
+done
