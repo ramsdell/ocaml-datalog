@@ -329,7 +329,7 @@ module Make(D: DatalogType):
 (* A theory is implemented as a hash table. *)
     type theory = (string, clause list) Hashtbl.t
 
-    let create = Hashtbl.create
+    let create = Hashtbl.create ~random:false
 
     let copy = Hashtbl.copy
 
