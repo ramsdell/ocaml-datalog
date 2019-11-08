@@ -105,10 +105,6 @@ module Make(D: DatalogType):
 
 (* enviroments *)
 
-    type binding = variable * term
-
-    type env = binding list
-
     let extend env var term =
       (var, term) :: env
 
@@ -133,9 +129,9 @@ module Make(D: DatalogType):
 
     let mkliteral pred terms = intern pred, terms
 
-    let getpred (pred, terms) = pred
+    let getpred (pred, _) = pred
 
-    let getterms (pred, terms) = terms
+    let getterms (_, terms) = terms
 
 (* variant checking between literals *)
 
@@ -179,7 +175,7 @@ module Make(D: DatalogType):
    hash function respects variants *)
     let hash_term term =
       match term with
-	Var var -> 101
+	Var _ -> 101
       | Val value -> D.hash value
 
     let hash_literal (pred, terms) =
@@ -219,11 +215,11 @@ module Make(D: DatalogType):
 
 (* rename variables in a literal *)
 
-    let shuffle env (pred, terms) =
+    let shuffle env (_, terms) =
       let rec loop env terms =
 	match terms with
 	  [] -> env
-	| Val value :: terms -> loop env terms
+	| Val _ :: terms -> loop env terms
 	| Var var :: terms ->
 	    match lookup env var with
 	      None -> loop (extend env var (fresh())) terms
@@ -277,16 +273,16 @@ module Make(D: DatalogType):
 
     let mkclause head body = head, body
 
-    let gethead (head, body) = head
+    let gethead (head, _) = head
 
-    let getbody (head, body) = body
+    let getbody (_, body) = body
 
 (* A clause is safe if every variable in the head is also in the body. *)
 
     let rec safe_var var body =
       match body with
 	[] -> false
-      | (pred, terms) :: body ->
+      | (_, terms) :: body ->
 	  List.mem (Var var) terms || safe_var var body
 
     let safe_term term body =
@@ -294,7 +290,7 @@ module Make(D: DatalogType):
 	Var var -> safe_var var body
       | _ -> true
 
-    let safe ((pred, terms), body) =
+    let safe ((_, terms), body) =
       let rec loop terms =
 	match terms with
 	  [] -> true
@@ -465,7 +461,7 @@ module Make(D: DatalogType):
 	      fact subgoal (symbol, acc)
 	  | v :: values ->
 	      tag_values (Val v :: acc) values in
-	let rec unify_results acc args results =
+	let unify_results acc args results =
           let results = List.map (fun v -> Val v) results in
 	  match unify_terms [] args results with
               None -> ()
