@@ -8,8 +8,8 @@ Horn clause, and every variable in the goal of a clause must appear in
 the body of the clause.  The use of Datalog syntax and an
 implementation based on tabling intermediate results, ensures that all
 queries terminate.  This is an OCaml version of the Lua implementation
-at <http://datalog.sf.net>, and documentation on that site is
-relevant.
+at <https://github.com/ramsdell/datalog>, and documentation on that
+site is relevant.
 
 This Datalog engine was extracted from the runtime system of the
 Cryptographic Protocol Programming Language (CPPL) at
