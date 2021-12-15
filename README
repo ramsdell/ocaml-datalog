@@ -13,12 +13,11 @@ site is relevant.
 
 This Datalog engine was extracted from the runtime system of the
 Cryptographic Protocol Programming Language (CPPL) at
-<http://www.ccs.neu.edu/home/ramsdell/tools/cppl-1.6.tar.gz>.  The
-Cryptographic Protocol Programming Language (CPPL) facilitates the
-design and implementation of hand-crafted protocols for electronic
-commerce and cross-organization distributed applications.  The Datalog
-engine is used to establish trust relations between communicating
-participants.
+<https://github.com/mitre/cppl>.  The Cryptographic Protocol
+Programming Language (CPPL) facilitates the design and implementation
+of hand-crafted protocols for electronic commerce and
+cross-organization distributed applications.  The Datalog engine is
+used to establish trust relations between communicating participants.
 
 To build the software, type "make".
 
